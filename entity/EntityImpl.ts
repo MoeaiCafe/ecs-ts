@@ -29,6 +29,8 @@ export class EntityImpl implements Entity {
     this._id = id;
 
     this._components = new Map();
+
+    this._isEnabled = true;
   }
 
   public addComponent(component: Component): void {
@@ -38,7 +40,7 @@ export class EntityImpl implements Entity {
 
     const type = component.constructor as Type;
     if (this.hasComponent(type)) {
-      throw new Error(`Cannot add component ${component} to ${this}! Entity already has a component with type ${type}`);
+      throw new Error(`Cannot add component ${component} to ${this}! Entity already has a component with type ${type.name}`);
     }
 
     this._components.set(type, component);
@@ -48,11 +50,11 @@ export class EntityImpl implements Entity {
 
   public removeComponent(type: Ctor<Component>): void {
     if (!this._isEnabled) {
-      throw new Error(`Cannot remove component ${type} from ${this}! Entity has already been destroyed`);
+      throw new Error(`Cannot remove component ${type.name} from ${this}! Entity has already been destroyed`);
     }
 
     if (!this.hasComponent(type)) {
-      throw new Error(`Cannot remove component ${type} from ${this}! Entity does not have a component of specified type!`);
+      throw new Error(`Cannot remove component ${type.name} from ${this}! Entity does not have a component of specified type!`);
     }
 
     this._removeComponent(type);
@@ -67,11 +69,11 @@ export class EntityImpl implements Entity {
 
   public replaceComponent<T extends Component>(type: Ctor<T>, newComponent: T): void {
     if (!this._isEnabled) {
-      throw new Error(`Cannot replace component ${type} on ${this}! Entity has already been destroyed`);
+      throw new Error(`Cannot replace component ${type.name} on ${this}! Entity has already been destroyed`);
     }
 
     if (!this.hasComponent(type)) {
-      throw new Error(`Cannot replace component ${type} on ${this}! Entity does not have a component of specified type!`);
+      throw new Error(`Cannot replace component ${type.name} on ${this}! Entity does not have a component of specified type!`);
     }
 
     this._replaceComponent(type, newComponent);
@@ -89,7 +91,7 @@ export class EntityImpl implements Entity {
   public getComponent<T extends Component>(type: Ctor<T>): T {
     const component = this._components.get(type);
     if (!component) {
-      throw new Error(`Cannot get component ${type} from ${this}! Entity does not have a component of specified type!`);
+      throw new Error(`Cannot get component ${type.name} from ${this}! Entity does not have a component of specified type!`);
     }
 
     return component as T;

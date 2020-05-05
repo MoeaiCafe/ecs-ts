@@ -23,7 +23,7 @@ export interface Context {
   /**
    * Returns all entities in the context.
    */
-  getAllEntities(): Set<Entity>;
+  getAllEntities(): ReadonlySet<Entity>;
 
   /**
    * Destories an entity in the context.

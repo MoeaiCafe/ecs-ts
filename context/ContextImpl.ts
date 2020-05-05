@@ -42,8 +42,8 @@ export class ContextImpl implements Context {
     return this._entities.has(entity);
   }
 
-  public getAllEntities(): Set<Entity> {
-    return new Set(this._entities);
+  public getAllEntities(): ReadonlySet<Entity> {
+    return this._entities as ReadonlySet<Entity>;
   }
 
   public destoryEntity(entity: Entity): void {
