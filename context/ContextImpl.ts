@@ -13,7 +13,7 @@ export class ContextImpl implements Context {
 
   private _entityIndex: int;
 
-  private readonly _entities: Set<Entity>;
+  private readonly _entities: Map<int, Entity>;
 
   private readonly _groups: Map<Matcher, Group>;
 
@@ -21,7 +21,7 @@ export class ContextImpl implements Context {
     this._name = name;
 
     this._entityIndex = 0;
-    this._entities = new Set();
+    this._entities = new Map();
 
     this._groups = new Map();
   }
@@ -30,7 +30,7 @@ export class ContextImpl implements Context {
     const entity = new EntityImpl();
     entity.initialize(++this._entityIndex);
 
-    this._entities.add(entity);
+    this._entities.set(entity.id, entity);
     // events
     entity.onComponentAdded.add(this.componentChangedHandler, this);
     entity.onComponentRemoved.add(this.componentChangedHandler, this);
@@ -38,27 +38,36 @@ export class ContextImpl implements Context {
     return entity;
   }
 
+  public getEntity(id: int): Entity {
+    const entity = this._entities.get(id);
+    if (!entity) {
+      throw new Error(`${this} cannot get entity with id ${id}! Context does not contain that entity!`);
+    }
+
+    return entity;
+  }
+
   public hasEntity(entity: Entity): boolean {
-    return this._entities.has(entity);
+    return this._entities.has(entity.id);
   }
 
   public getAllEntities(): ReadonlySet<Entity> {
-    return this._entities as ReadonlySet<Entity>;
+    return new Set(this._entities.values());
   }
 
   public destoryEntity(entity: Entity): void {
-    if (!this._entities.has(entity)) {
+    if (!this._entities.has(entity.id)) {
       throw new Error(`${this} cannot destroy ${entity}! Context does not contain that entity!`);
     }
 
     entity.destroy();
-    this._entities.delete(entity);
+    this._entities.delete(entity.id);
   }
 
   public destroyAllEntities(): void {
-    for (let entity of this._entities) {
+    for (let [id, entity] of this._entities) {
       entity.destroy();
-      this._entities.delete(entity);
+      this._entities.delete(id);
     }
   }
 
@@ -66,7 +75,7 @@ export class ContextImpl implements Context {
     let group = this._groups.get(matcher);
     if (!group) {
       group = new GroupImpl(matcher);
-      for (let entity of this._entities) {
+      for (let entity of this._entities.values()) {
         group.handleEntity(entity);
       }
 

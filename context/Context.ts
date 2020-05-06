@@ -1,6 +1,7 @@
 ﻿import { Entity } from "../entity/Entity";
 import { Group } from "../group/Group";
 import { Matcher } from "../matcher/Matcher";
+import { int } from "../helper/Types";
 
 /**
  * A manager of entities and groups.
@@ -19,6 +20,12 @@ export interface Context {
    * @param entity
    */
   hasEntity(entity: Entity): boolean;
+
+  /**
+   * Returns the entity with specified id.
+   * @param id id
+   */
+  getEntity(id: int): Entity;
 
   /**
    * Returns all entities in the context.
